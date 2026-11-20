@@ -1,3 +1,4 @@
+ HEAD
 # Course Management System
 
 A Spring Boot course management backend split into two services:
@@ -236,4 +237,7 @@ Note: full `mvn test` runs also execute the generated Spring context tests. Thos
 
 ## Author
 
-Developed as a Course Management System backend project.
+Developed as a Course Management System backend project
+# FormaGest
+Application Java SpringBoot pour la gestion des formations
+ 677561fe5fbce0c216463c5ee554150682cf307d
