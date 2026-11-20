@@ -1,17 +1,32 @@
-# ---- Build stage ----
-FROM maven:3.9-eclipse-temurin-21 AS build
-WORKDIR /build
-COPY pom.xml .
-# Cache dependencies in their own layer
-RUN mvn -B dependency:go-offline
-COPY src ./src
-RUN mvn -B clean package -DskipTests
 
-# ---- Runtime stage ----
+# Étape 1 : construction de l'application
+FROM maven:3.9-eclipse-temurin-21 AS build
+
+WORKDIR /build
+
+# Construire et installer le module partagé core
+COPY core/pom.xml core/pom.xml
+COPY core/src core/src
+
+RUN mvn -B -f core/pom.xml clean install -DskipTests
+
+# Construire le service public
+COPY public/pom.xml public/pom.xml
+COPY public/src public/src
+
+RUN mvn -B -f public/pom.xml clean package -DskipTests
+
+# Étape 2 : exécution
 FROM eclipse-temurin:21-jre-alpine
+
 WORKDIR /app
+
 RUN addgroup -S spring && adduser -S spring -G spring
-COPY --from=build --chown=spring:spring /build/target/*.jar app.jar
+
+COPY --from=build --chown=spring:spring /build/public/target/*.jar app.jar
+
 USER spring
+
 EXPOSE 8082
+
 ENTRYPOINT ["java", "-jar", "app.jar"]
